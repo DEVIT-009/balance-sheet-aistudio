@@ -1,0 +1,5 @@
+{
+  "name": "B_NIN Financial Tracker",
+  "description": "A financial tracking tool that manages expenses and received cash, providing a dashboard and Excel report exports.",
+  "requestFramePermissions": []
+}

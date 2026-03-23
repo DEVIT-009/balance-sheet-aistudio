@@ -1,0 +1,28 @@
+{
+  "expenses": [
+    {
+      "id": "e1",
+      "date": "2026-03-18",
+      "price": 23,
+      "delivery": 1.5,
+      "total": 24.5,
+      "description": ""
+    },
+    {
+      "date": "2026-03-19",
+      "price": 79,
+      "delivery": 0,
+      "total": 79,
+      "description": "Ey van b rath",
+      "id": "h-ede4RZjMc"
+    }
+  ],
+  "receives": [
+    {
+      "id": "r1",
+      "date": "2026-03-07",
+      "receive": 2500
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
