@@ -27,8 +27,8 @@ export const RecentExpenses: React.FC<RecentExpensesProps> = ({ expenses, setAct
             {expenses.length === 0 ? (
               <tr><td colSpan={3} className="empty-state">No entries yet. Add one above.</td></tr>
             ) : (
-              [...expenses].slice(-5).reverse().map(exp => (
-                <tr key={exp.id}>
+              [...expenses].slice(-5).reverse().map((exp, i) => (
+                <tr key={`${exp.id}-${i}`}>
                   <td>{formatDate(exp.date)}</td>
                   <td className="text-right">${formatCurrency(exp.total)}</td>
                   <td>{exp.description}</td>

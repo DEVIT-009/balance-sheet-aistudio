@@ -36,7 +36,7 @@ export const ReceiveTable: React.FC<ReceiveTableProps> = ({ receives, totalRecei
               <tr><td colSpan={4} className="empty-state">No entries yet. Add one above.</td></tr>
             ) : (
               receives.map((rec, i) => (
-                <tr key={rec.id} className={editingId === rec.id ? 'row-highlight' : ''}>
+                <tr key={`${rec.id}-${i}`} className={editingId === rec.id ? 'row-highlight' : ''}>
                   <td>{i + 1}</td>
                   <td>{formatDate(rec.date)}</td>
                   <td className="text-right">${formatCurrency(rec.receive)}</td>

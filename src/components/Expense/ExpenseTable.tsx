@@ -39,7 +39,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({ expenses, totalExpen
               <tr><td colSpan={7} className="empty-state">No entries yet. Add one above.</td></tr>
             ) : (
               expenses.map((exp, i) => (
-                <tr key={exp.id} className={editingId === exp.id ? 'row-highlight' : ''}>
+                <tr key={`${exp.id}-${i}`} className={editingId === exp.id ? 'row-highlight' : ''}>
                   <td>{i + 1}</td>
                   <td>{formatDate(exp.date)}</td>
                   <td className="text-right">${formatCurrency(exp.price)}</td>

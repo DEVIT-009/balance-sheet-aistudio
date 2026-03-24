@@ -26,8 +26,8 @@ export const RecentReceives: React.FC<RecentReceivesProps> = ({ receives, setAct
             {receives.length === 0 ? (
               <tr><td colSpan={2} className="empty-state">No entries yet. Add one above.</td></tr>
             ) : (
-              [...receives].slice(-5).reverse().map(rec => (
-                <tr key={rec.id}>
+              [...receives].slice(-5).reverse().map((rec, i) => (
+                <tr key={`${rec.id}-${i}`}>
                   <td>{formatDate(rec.date)}</td>
                   <td className="text-right">${formatCurrency(rec.receive)}</td>
                 </tr>
