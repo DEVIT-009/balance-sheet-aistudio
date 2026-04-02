@@ -14,6 +14,7 @@ import { RecentExpenses } from './components/Dashboard/RecentExpenses';
 import { RecentReceives } from './components/Dashboard/RecentReceives';
 import { ExpenseForm } from './components/Expense/ExpenseForm';
 import { ExpenseTable } from './components/Expense/ExpenseTable';
+import { ExpenseDetail } from './components/Expense/ExpenseDetail';
 import { ReceiveForm } from './components/Receive/ReceiveForm';
 import { ReceiveTable } from './components/Receive/ReceiveTable';
 
@@ -27,6 +28,7 @@ export default function App() {
   
   const [activeTab, setActiveTab] = useState('dashboard');
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [viewingExpenseDetail, setViewingExpenseDetail] = useState<Expense | null>(null);
   const [editingReceive, setEditingReceive] = useState<Receive | null>(null);
   
   // Advanced Report States
@@ -179,8 +181,25 @@ export default function App() {
 
             {activeTab === 'expenses' && (
               <div>
-                <ExpenseForm editingExpense={editingExpense} onSubmit={handleExpenseSubmit} onCancel={() => setEditingExpense(null)} showToast={showToast} />
-                <ExpenseTable expenses={expenses} totalExpense={totalExpense} editingId={editingExpense?.id || null} onEdit={(e) => { setEditingExpense(e); window.scrollTo({ top: 0, behavior: 'smooth' }); }} onDelete={deleteExpense} showToast={showToast} />
+                {viewingExpenseDetail ? (
+                  <ExpenseDetail 
+                    expense={viewingExpenseDetail} 
+                    onBack={() => setViewingExpenseDetail(null)} 
+                  />
+                ) : (
+                  <>
+                    <ExpenseForm editingExpense={editingExpense} onSubmit={handleExpenseSubmit} onCancel={() => setEditingExpense(null)} showToast={showToast} />
+                    <ExpenseTable 
+                      expenses={expenses} 
+                      totalExpense={totalExpense} 
+                      editingId={editingExpense?.id || null} 
+                      onEdit={(e) => { setEditingExpense(e); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                      onDelete={deleteExpense} 
+                      onViewDetail={(e) => setViewingExpenseDetail(e)}
+                      showToast={showToast} 
+                    />
+                  </>
+                )}
               </div>
             )}
 

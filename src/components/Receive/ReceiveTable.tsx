@@ -28,18 +28,26 @@ export const ReceiveTable: React.FC<ReceiveTableProps> = ({ receives, totalRecei
               <th>N</th>
               <th className="date-col">Date</th>
               <th className="text-right">Amount Received</th>
+              <th>Image</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {receives.length === 0 ? (
-              <tr><td colSpan={4} className="empty-state">No entries yet. Add one above.</td></tr>
+              <tr><td colSpan={5} className="empty-state">No entries yet. Add one above.</td></tr>
             ) : (
               receives.map((rec, i) => (
                 <tr key={`${rec.id}-${i}`} className={editingId === rec.id ? 'row-highlight' : ''}>
                   <td>{i + 1}</td>
                   <td>{formatDate(rec.date)}</td>
                   <td className="text-right">${formatCurrency(rec.receive)}</td>
+                  <td className="img-cell">
+                    {rec.image
+                      ? <a href={rec.image} target="_blank" rel="noopener noreferrer">
+                          <img src={rec.image} alt="receipt" className="img-thumb" />
+                        </a>
+                      : <span className="img-empty">—</span>}
+                  </td>
                   <td>
                     <button className="btn-icon" onClick={() => onEdit(rec)}>Edit</button>
                     <button className="btn-icon delete" onClick={() => handleDelete(rec.id)}>Delete</button>
@@ -51,7 +59,7 @@ export const ReceiveTable: React.FC<ReceiveTableProps> = ({ receives, totalRecei
               <tr className="totals-row">
                 <td colSpan={2} className="text-right">Total Received:</td>
                 <td className="text-right">${formatCurrency(totalReceived)}</td>
-                <td></td>
+                <td colSpan={2}></td>
               </tr>
             )}
           </tbody>

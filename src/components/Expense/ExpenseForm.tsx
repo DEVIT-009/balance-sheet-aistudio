@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Expense } from '../../types/expense';
 import { formatCurrency } from '../../utils/format';
+import { useImageUpload } from '../../hooks/useImageUpload';
 
 interface ExpenseFormProps {
   editingExpense: Expense | null;
@@ -14,6 +15,10 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ editingExpense, onSubm
   const [price, setPrice] = useState('');
   const [delivery, setDelivery] = useState('0');
   const [description, setDescription] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const { previewUrl, secureUrl, isUploading, uploadError, handleFileChange, resetImage, setExistingImage } =
+    useImageUpload();
 
   useEffect(() => {
     if (editingExpense) {
@@ -21,6 +26,8 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ editingExpense, onSubm
       setPrice(editingExpense.price.toString());
       setDelivery(editingExpense.delivery.toString());
       setDescription(editingExpense.description);
+      if (editingExpense.image) setExistingImage(editingExpense.image);
+      else resetImage();
     } else {
       resetForm();
     }
@@ -31,12 +38,22 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ editingExpense, onSubm
     setPrice('');
     setDelivery('0');
     setDescription('');
+    resetImage();
+    if (fileRef.current) fileRef.current.value = '';
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!date || price === '') {
       showToast('Date and Price are required', 'error');
+      return;
+    }
+    if (isUploading) {
+      showToast('Please wait for the image to finish uploading', 'error');
+      return;
+    }
+    if (uploadError) {
+      showToast('Fix the image upload error before submitting', 'error');
       return;
     }
 
@@ -48,7 +65,8 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ editingExpense, onSubm
       price: priceNum,
       delivery: deliveryNum,
       total: priceNum + deliveryNum,
-      description
+      description,
+      image: secureUrl, // empty string when no image chosen
     };
 
     if (editingExpense) {
@@ -82,12 +100,39 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ editingExpense, onSubm
             <label>Description</label>
             <input type="text" value={description} onChange={e => setDescription(e.target.value)} />
           </div>
+          <div className="form-group">
+            <label>Image <span className="label-optional">(optional)</span></label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="input-file"
+              onChange={e => handleFileChange(e.target.files?.[0] ?? null)}
+            />
+            {isUploading && <p className="upload-status uploading">⏳ Uploading…</p>}
+            {uploadError && <p className="upload-status error">⚠️ {uploadError}</p>}
+            {previewUrl && !isUploading && !uploadError && (
+              <div className="preview-container">
+                <img src={previewUrl} alt="preview" className="img-preview" />
+                <button 
+                  type="button" 
+                  className="btn-remove-image" 
+                  onClick={() => {
+                    resetImage();
+                    if (fileRef.current) fileRef.current.value = '';
+                  }}
+                >
+                  Remove Image
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         <div className="live-preview">
           Total = ${formatCurrency((Number(price) || 0) + (Number(delivery) || 0))}
         </div>
         <div className="form-actions">
-          <button type="submit" className="btn-submit">
+          <button type="submit" className="btn-submit" disabled={isUploading}>
             {editingExpense ? 'Update Expense' : 'Add Expense'}
           </button>
           {editingExpense && (

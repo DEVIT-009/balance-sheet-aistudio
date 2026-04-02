@@ -4,5 +4,6 @@ export interface Expense {
   price: number;
   delivery: number;
   total: number;
+  image: string;
   description: string;
 }
