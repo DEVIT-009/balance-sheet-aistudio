@@ -135,6 +135,12 @@ th { background: var(--bg-color); font-weight: 600; font-size: 0.9rem; color: va
 @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 /* Responsive */
+@media (max-width: 768px) {
+  .panels { grid-template-columns: 1fr; }
+  .cards { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 640px) {
   .topbar { flex-direction: column; align-items: stretch; }
   .topbar-right { flex-direction: column; align-items: stretch; width: 100%; }
