@@ -22,7 +22,7 @@ export const ReceiveTable: React.FC<ReceiveTableProps> = ({ receives, totalRecei
   return (
     <div className="panel">
       <div className="table-responsive">
-        <table>
+        <table className="table-zebra">
           <thead>
             <tr>
               <th>N</th>

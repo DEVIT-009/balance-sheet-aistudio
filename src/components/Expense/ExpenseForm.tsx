@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Expense } from '../../types/expense';
 import { formatCurrency } from '../../utils/format';
 import { useImageUpload } from '../../hooks/useImageUpload';
+import { Pencil, Plus } from 'lucide-react';
 
 interface ExpenseFormProps {
   editingExpense: Expense | null;
@@ -66,7 +67,11 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ editingExpense, onSubm
       delivery: deliveryNum,
       total: priceNum + deliveryNum,
       description,
-      image: secureUrl, // empty string when no image chosen
+      image: secureUrl,
+      is_transfer: editingExpense ? editingExpense.is_transfer : false,
+      transfer_to: editingExpense ? editingExpense.transfer_to : '',
+      transfer_at: editingExpense ? editingExpense.transfer_at : '',
+      transfer_image: editingExpense ? editingExpense.transfer_image : '',
     };
 
     if (editingExpense) {
@@ -133,6 +138,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ editingExpense, onSubm
         </div>
         <div className="form-actions">
           <button type="submit" className="btn-submit" disabled={isUploading}>
+            {editingExpense ? <Pencil size={14} /> : <Plus size={14} />}
             {editingExpense ? 'Update Expense' : 'Add Expense'}
           </button>
           {editingExpense && (

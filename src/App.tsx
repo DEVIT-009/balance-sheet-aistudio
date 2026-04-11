@@ -196,6 +196,7 @@ export default function App() {
                       onEdit={(e) => { setEditingExpense(e); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
                       onDelete={deleteExpense} 
                       onViewDetail={(e) => setViewingExpenseDetail(e)}
+                      onTransfer={(e) => handleExpenseSubmit(e)}
                       showToast={showToast} 
                     />
                   </>

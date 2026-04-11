@@ -6,4 +6,8 @@ export interface Expense {
   total: number;
   image: string;
   description: string;
+  is_transfer: boolean;
+  transfer_to: string;
+  transfer_at: string;
+  transfer_image: string
 }

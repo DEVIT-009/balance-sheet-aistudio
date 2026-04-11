@@ -73,6 +73,42 @@ export const ExpenseDetail: React.FC<ExpenseDetailProps> = ({ expense, onBack })
 
         <div className="detail-image-section">
           <h3>
+            <Truck size={20} style={{ marginRight: '0.5rem', display: 'inline-block', verticalAlign: 'middle' }} />
+            Transfer Status
+          </h3>
+          <div style={{ marginTop: '1rem', padding: '1.5rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            {expense.is_transfer ? (
+              <>
+                <p style={{ fontWeight: 600, color: 'var(--bal-pos)', marginBottom: '1.5rem', fontSize: '1.1rem' }}>
+                  ✓ Item is transfered.
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+                  <div>
+                    <div className="detail-label">Transfer Date</div>
+                    <div className="detail-value">{expense.transfer_at ? formatDate(expense.transfer_at) : '—'}</div>
+                  </div>
+                  <div>
+                    <div className="detail-label">Transfer To</div>
+                    <div className="detail-value">{expense.transfer_to || '—'}</div>
+                  </div>
+                </div>
+                {expense.transfer_image && (
+                  <div style={{ marginTop: '2rem' }}>
+                    <div className="detail-label" style={{ marginBottom: '0.5rem' }}>Transfer Image</div>
+                    <div className="image-large-container">
+                      <img src={expense.transfer_image} alt="Transfer Details" className="detail-image-large" />
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p style={{ fontWeight: 500, color: 'var(--text-muted)' }}>Item is NOT transfer yet.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="detail-image-section">
+          <h3>
             <ImageIcon size={20} style={{ marginRight: '0.5rem', display: 'inline-block', verticalAlign: 'middle' }} />
             Receipt Image
           </h3>
