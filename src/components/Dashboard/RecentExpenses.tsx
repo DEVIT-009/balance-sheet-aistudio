@@ -4,7 +4,7 @@ import { formatDate, formatCurrency } from '../../utils/format';
 
 interface RecentExpensesProps {
   expenses: Expense[];
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (tab: 'dashboard' | 'expenses' | 'receives') => void;
 }
 
 export const RecentExpenses: React.FC<RecentExpensesProps> = ({ expenses, setActiveTab }) => {

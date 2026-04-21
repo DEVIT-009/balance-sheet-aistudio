@@ -4,7 +4,7 @@ import { formatDate, formatCurrency } from '../../utils/format';
 
 interface RecentReceivesProps {
   receives: Receive[];
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (tab: 'dashboard' | 'expenses' | 'receives') => void;
 }
 
 export const RecentReceives: React.FC<RecentReceivesProps> = ({ receives, setActiveTab }) => {

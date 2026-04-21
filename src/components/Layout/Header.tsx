@@ -1,10 +1,11 @@
 import React from 'react';
-import { FileSpreadsheet, FileText, Eye, Settings } from 'lucide-react';
+import { FileSpreadsheet, FileText, Eye, LogOut, Settings } from 'lucide-react';
 
 interface HeaderProps {
   onDownload: (type: 'excel' | 'pdf') => void;
   onViewInvoice: () => void;
   onOpenAdvance: () => void;
+  onLogout: () => void;
   isLoading: boolean;
 }
 
@@ -12,6 +13,7 @@ export const Header: React.FC<HeaderProps> = ({
   onDownload, 
   onViewInvoice, 
   onOpenAdvance, 
+  onLogout,
   isLoading 
 }) => {
   return (
@@ -30,6 +32,9 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button className="btn-download advance" onClick={onOpenAdvance} disabled={isLoading}>
             <Settings className="w-4 h-4" /> Advance
+          </button>
+          <button className="btn-download logout" onClick={onLogout}>
+            <LogOut className="w-4 h-4" /> Logout
           </button>
         </div>
       </div>

@@ -3,10 +3,21 @@ import { useExpenses } from './hooks/useExpenses';
 import { useReceives } from './hooks/useReceives';
 import { useToast } from './hooks/useToast';
 import { downloadReport, downloadPDFReport } from './services/reportService';
+import {
+  APP_ROUTES,
+  clearStoredToken,
+  getProtectedRouteFromPath,
+  getPathFromTab,
+  getTabFromPath,
+  isAuthenticated,
+  storeToken,
+  validateCredentials,
+} from './utils/auth';
 
 import { Tabs } from './components/UI/Tabs';
 import { Toast } from './components/UI/Toast';
 import { Header } from './components/Layout/Header';
+import { LoginPage } from './components/Auth/LoginPage';
 import { AdvancedReportModal } from './components/Reports/AdvancedReportModal';
 import { InvoiceView } from './components/Reports/InvoiceView';
 import { DashboardCards } from './components/Dashboard/DashboardCards';
@@ -21,12 +32,15 @@ import { ReceiveTable } from './components/Receive/ReceiveTable';
 import { Expense } from './types/expense';
 import { Receive } from './types/receive';
 
+type AppTab = 'dashboard' | 'expenses' | 'receives';
+
 export default function App() {
   const { expenses, totalExpense, addExpense, updateExpense, deleteExpense, loading: expensesLoading, error: expensesError } = useExpenses();
   const { receives, totalReceived, addReceive, updateReceive, deleteReceive, loading: receivesLoading, error: receivesError } = useReceives();
   const { toast, showToast } = useToast();
   
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [isLoggedIn, setIsLoggedIn] = useState(() => isAuthenticated());
+  const [activeTab, setActiveTabState] = useState<AppTab>(() => getTabFromPath(window.location.pathname));
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [viewingExpenseDetail, setViewingExpenseDetail] = useState<Expense | null>(null);
   const [editingReceive, setEditingReceive] = useState<Receive | null>(null);
@@ -49,6 +63,12 @@ export default function App() {
 
   const balance = totalReceived - totalExpense;
 
+  const navigateTo = (path: string, replace: boolean = false) => {
+    const navigate = replace ? window.history.replaceState : window.history.pushState;
+    navigate.call(window.history, {}, '', path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
   useEffect(() => {
     const loadScript = (id: string, src: string) => {
       if (!document.getElementById(id)) {
@@ -62,6 +82,62 @@ export default function App() {
     loadScript('jspdf-script', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
     loadScript('jspdf-autotable-script', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js');
   }, []);
+
+  useEffect(() => {
+    const syncRouteState = () => {
+      const pathname = window.location.pathname;
+      const loggedIn = isAuthenticated();
+
+      setIsLoggedIn(loggedIn);
+
+      if (!loggedIn) {
+        if (pathname !== APP_ROUTES.login) {
+          navigateTo(APP_ROUTES.login, true);
+        }
+        return;
+      }
+
+      if (pathname === APP_ROUTES.login) {
+        navigateTo(APP_ROUTES.dashboard, true);
+        return;
+      }
+
+      setActiveTabState(getTabFromPath(pathname) as AppTab);
+    };
+
+    syncRouteState();
+    window.addEventListener('popstate', syncRouteState);
+
+    return () => {
+      window.removeEventListener('popstate', syncRouteState);
+    };
+  }, []);
+
+  const setActiveTab = (tab: AppTab) => {
+    setActiveTabState(tab);
+    navigateTo(getPathFromTab(tab));
+  };
+
+  const handleLogin = (username: string, password: string) => {
+    if (!validateCredentials(username, password)) {
+      return false;
+    }
+
+    storeToken(import.meta.env.VITE_TOKEN);
+    setIsLoggedIn(true);
+    navigateTo(APP_ROUTES.dashboard, true);
+    return true;
+  };
+
+  const handleLogout = () => {
+    clearStoredToken();
+    setIsLoggedIn(false);
+    setEditingExpense(null);
+    setEditingReceive(null);
+    setViewingExpenseDetail(null);
+    setIsViewingInvoice(false);
+    navigateTo(APP_ROUTES.login, true);
+  };
 
   const handleDownload = (type: 'excel' | 'pdf', isAdvanced: boolean = false) => {
     let filteredExpenses = [...expenses];
@@ -134,6 +210,10 @@ export default function App() {
   const isLoading = expensesLoading || receivesLoading;
   const hasError = expensesError || receivesError;
 
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
   if (isViewingInvoice && invoiceData) {
     return <InvoiceView data={invoiceData} onClose={() => setIsViewingInvoice(false)} />;
   }
@@ -144,6 +224,7 @@ export default function App() {
         onDownload={handleDownload} 
         onViewInvoice={() => handleViewInvoice(false)} 
         onOpenAdvance={() => { setFormError(''); setIsModalOpen(true); }}
+        onLogout={handleLogout}
         isLoading={isLoading} 
       />
 
@@ -217,4 +298,3 @@ export default function App() {
     </div>
   );
 }
-

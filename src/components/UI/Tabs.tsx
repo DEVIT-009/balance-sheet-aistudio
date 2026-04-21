@@ -2,7 +2,7 @@ import React from 'react';
 
 interface TabsProps {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (tab: 'dashboard' | 'expenses' | 'receives') => void;
 }
 
 export const Tabs: React.FC<TabsProps> = ({ activeTab, setActiveTab }) => {
