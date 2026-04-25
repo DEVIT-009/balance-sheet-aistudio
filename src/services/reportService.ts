@@ -128,8 +128,15 @@ export const downloadPDFReport = (
     margin: { left: 14 }
   });
 
+  const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+
   // Expenses Table
-  const expStartY = (doc as any).lastAutoTable.finalY + 15;
+  let expStartY = (doc as any).lastAutoTable.finalY + 15;
+  if (expStartY > pageHeight - 20) {
+    doc.addPage();
+    expStartY = 20;
+  }
+  
   doc.setTextColor(12, 61, 110);
   doc.text('EXPENSES DETAILS', 14, expStartY);
   
@@ -161,7 +168,12 @@ export const downloadPDFReport = (
   });
 
   // Receives Table
-  const recStartY = (doc as any).lastAutoTable.finalY + 15;
+  let recStartY = (doc as any).lastAutoTable.finalY + 15;
+  if (recStartY > pageHeight - 20) {
+    doc.addPage();
+    recStartY = 20;
+  }
+
   doc.setTextColor(15, 122, 90);
   doc.text('RECEIVE CASH DETAILS', 14, recStartY);
 

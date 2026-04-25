@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useExpenses } from './hooks/useExpenses';
 import { useReceives } from './hooks/useReceives';
 import { useToast } from './hooks/useToast';
-import { downloadReport, downloadPDFReport } from './services/reportService';
 import {
   APP_ROUTES,
   clearStoredToken,
@@ -18,7 +17,6 @@ import { Tabs } from './components/UI/Tabs';
 import { Toast } from './components/UI/Toast';
 import { Header } from './components/Layout/Header';
 import { LoginPage } from './components/Auth/LoginPage';
-import { AdvancedReportModal } from './components/Reports/AdvancedReportModal';
 import { InvoiceView } from './components/Reports/InvoiceView';
 import { DashboardCards } from './components/Dashboard/DashboardCards';
 import { RecentExpenses } from './components/Dashboard/RecentExpenses';
@@ -44,22 +42,7 @@ export default function App() {
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [viewingExpenseDetail, setViewingExpenseDetail] = useState<Expense | null>(null);
   const [editingReceive, setEditingReceive] = useState<Receive | null>(null);
-  
-  // Advanced Report States
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [expDates, setExpDates] = useState({ start: '', end: '' });
-  const [recDates, setRecDates] = useState({ start: '', end: '' });
-  const [formError, setFormError] = useState('');
-  
-  // Invoice View States
   const [isViewingInvoice, setIsViewingInvoice] = useState(false);
-  const [invoiceData, setInvoiceData] = useState<{
-    expenses: Expense[], 
-    receives: Receive[], 
-    totalExp: number, 
-    totalRec: number, 
-    balance: number 
-  } | null>(null);
 
   const balance = totalReceived - totalExpense;
 
@@ -68,20 +51,6 @@ export default function App() {
     navigate.call(window.history, {}, '', path);
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
-
-  useEffect(() => {
-    const loadScript = (id: string, src: string) => {
-      if (!document.getElementById(id)) {
-        const script = document.createElement('script');
-        script.id = id;
-        script.src = src;
-        document.body.appendChild(script);
-      }
-    };
-    loadScript('sheetjs-script', 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
-    loadScript('jspdf-script', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-    loadScript('jspdf-autotable-script', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js');
-  }, []);
 
   useEffect(() => {
     const syncRouteState = () => {
@@ -139,62 +108,12 @@ export default function App() {
     navigateTo(APP_ROUTES.login, true);
   };
 
-  const handleDownload = (type: 'excel' | 'pdf', isAdvanced: boolean = false) => {
-    let filteredExpenses = [...expenses];
-    let filteredReceives = [...receives];
-
-    if (isAdvanced) {
-      if (!expDates.start || !expDates.end || !recDates.start || !recDates.end) {
-        setFormError('Date Required');
-        return;
-      }
-      setFormError('');
-      filteredExpenses = expenses.filter(e => e.date >= expDates.start && e.date <= expDates.end);
-      filteredReceives = receives.filter(r => r.date >= recDates.start && r.date <= recDates.end);
-    }
-
-    if (filteredExpenses.length === 0 && filteredReceives.length === 0) {
+  const handleViewInvoice = () => {
+    if (expenses.length === 0 && receives.length === 0) {
       showToast('No Data Exist', 'error');
-      if (isAdvanced) setIsModalOpen(false);
       return;
     }
-
-    const tExp = filteredExpenses.reduce((sum, e) => sum + Number(e.total), 0);
-    const tRec = filteredReceives.reduce((sum, r) => sum + Number(r.receive), 0);
-
-    if (type === 'excel') {
-      downloadReport(filteredExpenses, filteredReceives, tExp, tRec, tRec - tExp, showToast);
-    } else {
-      downloadPDFReport(filteredExpenses, filteredReceives, tExp, tRec, tRec - tExp, showToast);
-    }
-  };
-
-  const handleViewInvoice = (isAdvanced: boolean = false) => {
-    let filteredExpenses = [...expenses];
-    let filteredReceives = [...receives];
-
-    if (isAdvanced) {
-      if (!expDates.start || !expDates.end || !recDates.start || !recDates.end) {
-        setFormError('Date Required');
-        return;
-      }
-      setFormError('');
-      filteredExpenses = expenses.filter(e => e.date >= expDates.start && e.date <= expDates.end);
-      filteredReceives = receives.filter(r => r.date >= recDates.start && r.date <= recDates.end);
-    }
-
-    if (filteredExpenses.length === 0 && filteredReceives.length === 0) {
-      showToast('No Data Exist', 'error');
-      if (isAdvanced) setIsModalOpen(false);
-      return;
-    }
-
-    const tExp = filteredExpenses.reduce((sum, e) => sum + Number(e.total), 0);
-    const tRec = filteredReceives.reduce((sum, r) => sum + Number(r.receive), 0);
-    
-    setInvoiceData({ expenses: filteredExpenses, receives: filteredReceives, totalExp: tExp, totalRec: tRec, balance: tRec - tExp });
     setIsViewingInvoice(true);
-    setIsModalOpen(false);
   };
 
   const handleExpenseSubmit = async (data: Omit<Expense, 'id'> | Expense) => {
@@ -214,32 +133,17 @@ export default function App() {
     return <LoginPage onLogin={handleLogin} />;
   }
 
-  if (isViewingInvoice && invoiceData) {
-    return <InvoiceView data={invoiceData} onClose={() => setIsViewingInvoice(false)} />;
+  if (isViewingInvoice) {
+    return <InvoiceView expenses={expenses} receives={receives} onClose={() => setIsViewingInvoice(false)} />;
   }
 
   return (
     <div className="app-container">
       <Header 
-        onDownload={handleDownload} 
-        onViewInvoice={() => handleViewInvoice(false)} 
-        onOpenAdvance={() => { setFormError(''); setIsModalOpen(true); }}
+        onViewInvoice={handleViewInvoice}
         onLogout={handleLogout}
         isLoading={isLoading} 
       />
-
-      {isModalOpen && (
-        <AdvancedReportModal 
-          onClose={() => setIsModalOpen(false)}
-          onDownload={handleDownload}
-          onView={handleViewInvoice}
-          expDates={expDates}
-          setExpDates={setExpDates}
-          recDates={recDates}
-          setRecDates={setRecDates}
-          error={formError}
-        />
-      )}
 
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
