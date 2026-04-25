@@ -22,7 +22,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({ expenses, totalExpen
   const [transferringExpense, setTransferringExpense] = useState<Expense | null>(null);
   const [sortKey, setSortKey] = useState<'date' | 'price' | 'delivery' | 'total' | 'status' | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'transfered' | 'not yet'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'transfered' | 'onhand'>('all');
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -126,7 +126,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({ expenses, totalExpen
             >
               <option value="all">All Status</option>
               <option value="transfered">Transfered</option>
-              <option value="not yet">Not Yet</option>
+              <option value="onhand">OnHand</option>
             </select>
           </div>
         </div>
@@ -162,7 +162,7 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({ expenses, totalExpen
                     {
                       exp.is_transfer 
                       ? <span className="badge badge-success">transfered</span>
-                      : <span className="badge badge-error">not yet</span>
+                      : <span className="badge badge-error">OnHand</span>
                     }
                   </td>
                   <td className="img-cell">
