@@ -70,6 +70,8 @@ body { font-family: system-ui, sans-serif; background: var(--bg-color); color: v
 .invoice-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 0.9rem; }
 .invoice-table th { background: #f1f5f9; color: var(--text-main); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; padding: 0.75rem; border: 1px solid #e2e8f0; }
 .invoice-table td { padding: 0.75rem; border: 1px solid #e2e8f0; }
+.invoice-image-cell { width: 74px; text-align: center; vertical-align: middle; }
+.invoice-image-thumb { width: 54px; height: 54px; object-fit: cover; border: 1px solid var(--border-color); border-radius: 4px; display: inline-block; }
 .invoice-total-row { font-weight: 800; background: #f8fafc; }
 
 /* Print Styles */

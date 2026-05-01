@@ -120,6 +120,7 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({ onClose, expenses, rec
             <tr>
               <th style={{ width: '40px' }}>N</th>
               <th>Date</th>
+              <th>Image</th>
               <th>Price</th>
               <th>Delivery</th>
               <th>Total</th>
@@ -129,13 +130,20 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({ onClose, expenses, rec
           <tbody>
             {filteredExpenses.length === 0 ? (
               <tr>
-                <td colSpan={6} className="empty-state">No expense data in this date range.</td>
+                <td colSpan={7} className="empty-state">No expense data in this date range.</td>
               </tr>
             ) : (
               filteredExpenses.map((e, i) => (
                 <tr key={e.id}>
                   <td>{i + 1}</td>
                   <td>{formatDate(e.date)}</td>
+                  <td className="invoice-image-cell">
+                    {e.image ? (
+                      <img src={e.image} alt="Expense receipt" className="invoice-image-thumb" />
+                    ) : (
+                      <span className="img-empty">-</span>
+                    )}
+                  </td>
                   <td>${Number(e.price).toFixed(2)}</td>
                   <td>${Number(e.delivery).toFixed(2)}</td>
                   <td>${Number(e.total).toFixed(2)}</td>
@@ -144,7 +152,7 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({ onClose, expenses, rec
               ))
             )}
             <tr className="invoice-total-row">
-              <td colSpan={4} style={{ textAlign: 'right' }}>TOTAL EXPENSE</td>
+              <td colSpan={5} style={{ textAlign: 'right' }}>TOTAL EXPENSE</td>
               <td>${formatCurrency(totalExpense)}</td>
               <td></td>
             </tr>
@@ -189,25 +197,33 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({ onClose, expenses, rec
             <tr>
               <th style={{ width: '40px' }}>N</th>
               <th>Date</th>
+              <th>Image</th>
               <th>Amount Received</th>
             </tr>
           </thead>
           <tbody>
             {filteredReceives.length === 0 ? (
               <tr>
-                <td colSpan={3} className="empty-state">No receive data in this date range.</td>
+                <td colSpan={4} className="empty-state">No receive data in this date range.</td>
               </tr>
             ) : (
               filteredReceives.map((r, i) => (
                 <tr key={r.id}>
                   <td>{i + 1}</td>
                   <td>{formatDate(r.date)}</td>
+                  <td className="invoice-image-cell">
+                    {r.image ? (
+                      <img src={r.image} alt="Receive receipt" className="invoice-image-thumb" />
+                    ) : (
+                      <span className="img-empty">-</span>
+                    )}
+                  </td>
                   <td>${Number(r.receive).toFixed(2)}</td>
                 </tr>
               ))
             )}
             <tr className="invoice-total-row">
-              <td colSpan={2} style={{ textAlign: 'right' }}>TOTAL RECEIVED</td>
+              <td colSpan={3} style={{ textAlign: 'right' }}>TOTAL RECEIVED</td>
               <td>${formatCurrency(totalReceive)}</td>
             </tr>
           </tbody>

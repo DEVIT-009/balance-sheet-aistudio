@@ -27,32 +27,34 @@ export const downloadReport = (
 
   // 1. EXPENSES SECTION
   reportData.push(['EXPENSES DETAILS']);
-  reportData.push(['N', 'Date', 'Price ($)', 'Delivery ($)', 'Total ($)', 'Description']);
+  reportData.push(['N', 'Date', 'Image', 'Price ($)', 'Delivery ($)', 'Total ($)', 'Description']);
   expenses.forEach((e, i) => {
     reportData.push([
       i + 1,
       formatDate(e.date),
+      e.image || '',
       Number(e.price),
       Number(e.delivery),
       Number(e.total),
       e.description
     ]);
   });
-  reportData.push(['', '', '', 'TOTAL EXPENSE', Number(totalExpense), '']);
+  reportData.push(['', '', '', '', 'TOTAL EXPENSE', Number(totalExpense), '']);
   reportData.push([]);
   reportData.push([]);
 
   // 2. RECEIVES SECTION
   reportData.push(['RECEIVE CASH DETAILS']);
-  reportData.push(['N', 'Date', 'Amount Received ($)']);
+  reportData.push(['N', 'Date', 'Image', 'Amount Received ($)']);
   receives.forEach((r, i) => {
     reportData.push([
       i + 1,
       formatDate(r.date),
+      r.image || '',
       Number(r.receive)
     ]);
   });
-  reportData.push(['', 'TOTAL RECEIVED', Number(totalReceived)]);
+  reportData.push(['', '', 'TOTAL RECEIVED', Number(totalReceived)]);
   reportData.push([]);
   reportData.push([]);
 
@@ -69,6 +71,7 @@ export const downloadReport = (
   ws['!cols'] = [
     { wch: 6 },   // N
     { wch: 15 },  // Date
+    { wch: 45 },  // Image URL
     { wch: 20 },  // Price / Amount Received
     { wch: 15 },  // Delivery
     { wch: 15 },  // Total
@@ -143,16 +146,17 @@ export const downloadPDFReport = (
   const expRows = expenses.map((e, i) => [
     i + 1,
     formatDate(e.date),
+    e.image ? 'Image attached' : '',
     `$${Number(e.price).toFixed(2)}`,
     `$${Number(e.delivery).toFixed(2)}`,
     `$${Number(e.total).toFixed(2)}`,
     e.description
   ]);
-  expRows.push(['', '', '', 'TOTAL', `$${totalExpense.toFixed(2)}`, '']);
+  expRows.push(['', '', '', '', 'TOTAL', `$${totalExpense.toFixed(2)}`, '']);
 
   (doc as any).autoTable({
     startY: expStartY + 5,
-    head: [['N', 'Date', 'Price', 'Delivery', 'Total', 'Description']],
+    head: [['N', 'Date', 'Image', 'Price', 'Delivery', 'Total', 'Description']],
     body: expRows,
     theme: 'striped',
     headStyles: { fillColor: [12, 61, 110], textColor: [255, 255, 255] },
@@ -160,10 +164,11 @@ export const downloadPDFReport = (
     columnStyles: {
       0: { cellWidth: 10 },
       1: { cellWidth: 25 },
-      2: { cellWidth: 20 },
+      2: { cellWidth: 22 },
       3: { cellWidth: 20 },
-      4: { cellWidth: 20, fontStyle: 'bold' },
-      5: { cellWidth: 'auto' }
+      4: { cellWidth: 20 },
+      5: { cellWidth: 20, fontStyle: 'bold' },
+      6: { cellWidth: 'auto' }
     }
   });
 
@@ -180,13 +185,14 @@ export const downloadPDFReport = (
   const recRows = receives.map((r, i) => [
     i + 1,
     formatDate(r.date),
+    r.image ? 'Image attached' : '',
     `$${Number(r.receive).toFixed(2)}`
   ]);
-  recRows.push(['', 'TOTAL', `$${totalReceived.toFixed(2)}`]);
+  recRows.push(['', '', 'TOTAL', `$${totalReceived.toFixed(2)}`]);
 
   (doc as any).autoTable({
     startY: recStartY + 5,
-    head: [['N', 'Date', 'Amount Received']],
+    head: [['N', 'Date', 'Image', 'Amount Received']],
     body: recRows,
     theme: 'striped',
     headStyles: { fillColor: [15, 122, 90], textColor: [255, 255, 255] },
@@ -194,12 +200,12 @@ export const downloadPDFReport = (
     columnStyles: {
       0: { cellWidth: 10 },
       1: { cellWidth: 40 },
-      2: { cellWidth: 'auto', fontStyle: 'bold' }
+      2: { cellWidth: 30 },
+      3: { cellWidth: 'auto', fontStyle: 'bold' }
     }
   });
 
   const filename = `B_NIN_Tracker_Report_${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(filename);
 };
-
 
